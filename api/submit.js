@@ -1,37 +1,58 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// This allows Vercel to read the body of your form
 module.exports = async (req, res) => {
+  // 1. Initialize Supabase inside the handler
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_KEY
   );
 
+  // 2. Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).send('Method Not Allowed');
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
+    // 3. Destructure the form data
     const { name, age, destination, budget, party_size, travel_date, phone, message } = req.body;
 
+    // 4. Send to Supabase
     const { data, error } = await supabase
-      .from('inquiries') // <--- DOUBLE CHECK THIS matches Supabase exactly
-      .insert([{ 
+      .from('inquiries')
+      .insert([
+        { 
           name, 
-          age: parseInt(age), 
+          age: age ? parseInt(age) : null, 
           destination, 
-          budget: parseInt(budget), 
-          party_size: parseInt(party_size), 
-          travel_date, 
+          budget: budget ? parseInt(budget) : null, 
+          party_size: party_size ? parseInt(party_size) : null, 
+          travel_date: travel_date || null, 
           phone, 
           message 
-      }]);
+        }
+      ]);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase Error:", error.message);
+      throw error;
+    }
 
-    res.send("<h1>Success!</h1><p>Your tropical escape is being planned.</p><a href='/'>Back</a>");
-  } catch (error) {
-    console.error("Database Error:", error);
-    res.status(500).json({ error: error.message });
+    // 5. Success Response
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(`
+      <div style="text-align:center; font-family:sans-serif; padding:50px; background:#f4e4bc; height:100vh;">
+        <h1 style="color:#00afaf;">🌴 Aloha!</h1>
+        <p>Your tropical getaway inquiry has been received.</p>
+        <a href="/" style="color:#ff7e5f; font-weight:bold;">Return Home</a>
+      </div>
+    `);
+
+  } catch (err) {
+    // This will show up in your Vercel "Logs" tab
+    console.error("Function Crash Details:", err);
+    res.status(500).json({ 
+      error: "Internal Server Error", 
+      details: err.message 
+    });
   }
 };
