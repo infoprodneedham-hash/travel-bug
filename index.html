@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Island Getaway | Plan Your Escape</title>
+    <style>
+        :root {
+            --tropical-blue: #00afaf;
+            --sand: #f4e4bc;
+            --sunset-orange: #ff7e5f;
+            --palm-green: #2d5a27;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #333;
+        }
+
+        header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 50px;
+        }
+
+        .login-trigger {
+            background: var(--sunset-orange);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .login-trigger:hover { transform: scale(1.05); }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 { color: var(--tropical-blue); text-align: center; }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button.submit-btn {
+            background: var(--palm-green);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal-content {
+            background-color: var(--sand);
+            margin: 10% auto;
+            padding: 30px;
+            width: 300px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px; top: 10px;
+            font-size: 24px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="login-trigger" onclick="toggleModal(true)">Login to Account</button>
+</header>
+
+<div class="form-container">
+    <h1>Find Your Paradise</h1>
+    <form action="/submit-trip" method="POST" class="grid-form">
+        <div>
+            <label>Full Name</label>
+            <input type="text" name="name" required>
+        </div>
+        <div>
+            <label>Age</label>
+            <input type="number" name="age" min="18" required>
+        </div>
+        <div class="full-width">
+            <label>Favorite Holiday Destination</label>
+            <input type="text" name="destination" placeholder="e.g. Bora Bora" required>
+        </div>
+        <div>
+            <label>Budget (USD)</label>
+            <input type="number" name="budget" min="1000" max="15000" step="500" value="1000">
+        </div>
+        <div>
+            <label>Party Size</label>
+            <input type="number" name="party_size" min="1" required>
+        </div>
+        <div>
+            <label>Expected Travel Date</label>
+            <input type="date" name="travel_date">
+        </div>
+        <div>
+            <label>Contact Phone</label>
+            <input type="tel" name="phone" required>
+        </div>
+        <div class="full-width">
+            <label>Message / Special Requests</label>
+            <textarea name="message" rows="3"></textarea>
+        </div>
+        <div class="full-width">
+            <button type="submit" class="submit-btn">Send My Quote 🌴</button>
+        </div>
+    </form>
+</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="toggleModal(false)">&times;</span>
+        <h3>Member Login</h3>
+        <form id="loginForm">
+            <label>Username</label>
+            <input type="text" id="user" required style="margin-bottom:15px;">
+            <label>Password</label>
+            <input type="password" id="pass" required style="margin-bottom:10px;">
+            <div style="margin-bottom:15px; font-size: 0.8em;">
+                <input type="checkbox" id="remember" style="width: auto;"> Remember me
+            </div>
+            <button type="submit" class="submit-btn" style="background: var(--tropical-blue);">Login</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Toggle Modal Visibility
+    function toggleModal(show) {
+        document.getElementById('loginModal').style.display = show ? 'block' : 'none';
+    }
+
+    // Close modal if user clicks outside of it
+    window.onclick = function(event) {
+        let modal = document.getElementById('loginModal');
+        if (event.target == modal) toggleModal(false);
+    }
+
+    // Handle Login (To be connected to your backend later)
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('user').value;
+        // Checkboxes return true/false
+        const remember = document.getElementById('remember').checked;
+        
+        console.log("Attempting login for:", user, "Remember Me:", remember);
+        alert("Login functionality will be handled by your database soon!");
+    });
+</script>
+
+</body>
+</html>
